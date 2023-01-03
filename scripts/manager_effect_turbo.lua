@@ -13,17 +13,18 @@ local aEffectUpdatedCurrent = {};
 local aEffectDeleted = {};
 
 -- Tag is rEffectComp.type uppercase if exists and ignoring conditional tags else
--- the first clause (element) rEffectComp[1] which is everything before the between the ;
+-- the first clause (element) rEffectComp[1] which is everything between the ;
 -- The latter is ignored if containing a space.
 -- tEffectsCT[Actor CT Node Path][Tags][Effect Node Path]
-local tEffectsCT = {}
+local tEffectsCT = {};
 
-local tLabelOutstandingLookup = {}
+local tLabelOutstandingLookup = {};
+
 --tEffectsLookup[Effect Node Path][Tags]  -- The Actor is implied as it is the parent of the effect
-local tEffectsLookup = {}
+local tEffectsLookup = {};
 
 -- Global tags to ignore
-_aTurboIgnoreTags = {"", "IF", "IFT"}
+_aTurboIgnoreTags = {"", "IF", "IFT"};
 
 local function onCustomEffectAdded(nodeEffect)
 	for _,fCustomEffectAdded in ipairs(aEffectAdded) do
@@ -33,22 +34,16 @@ end
 
 local function onCustomEffectUpdatedPrevious(sActor,sTag,sPath)
     if next(aEffectUpdatedPrevious) then
-        local sActorCopy = sActor;
-        local sEffectCopy = sPath
-        local sTagCopy = sTag;
         for _,fCustomEffectUpdatedPrevious in ipairs(aEffectUpdatedPrevious) do
-            fCustomEffectUpdatedPrevious(sActorCopy, sTagCopy, sEffectCopy);
+            fCustomEffectUpdatedPrevious(sActor, sTag, sPath);
         end
     end
 end
 
 local function onCustomEffectUpdatedCurrent(sActor,sTag,sPath)
     if next(aEffectUpdatedCurrent) then
-        local sActorCopy = sActor;
-        local sEffectCopy = sPath
-        local sTagCopy = sTag;
         for _,fCustomEffectUpdatedCurrent in ipairs(aEffectUpdatedCurrent) do
-            fCustomEffectUpdatedCurrent(sActorCopy, sTagCopy, sEffectCopy);
+            fCustomEffectUpdatedCurrent(sActor, sTag, sPath);
         end
     end
 end
@@ -63,7 +58,7 @@ local function updateEffectsTables(sActor, sLabel, sPath)
 	local tEffectComps = EffectManager.parseEffect(sLabel);
 	for _,sComp in pairs(tEffectComps) do
 		local rEffectComp = EffectManager.parseEffectCompSimple(sComp);
-		local sTag = rEffectComp.type:upper();
+		local sTag = rEffectComp.type;
 		if sTag == "" and not rEffectComp.original:match("%s") then
 			sTag = rEffectComp.original;
 		end
@@ -143,10 +138,10 @@ local function unregisterEffectGuarded(nodeEffect)
 	local nodeLabel = DB.getChild(nodeEffect, "label");
 	local sPath = nodeEffect.getPath();
 	local sActor = DB.getChild(nodeEffect, "...").getPath();
+	onCustomEffectDeleted(nodeLabel);
 	for sTag,_ in pairs(tEffectsLookup[sPath]) do
 		DB.removeHandler(nodeLabel.getPath(), "onUpdate", updateRegisteredEffect);
 		DB.removeHandler(sPath, "onDelete", unregisterEffect);
-        onCustomEffectDeleted(nodeLabel);
 		tEffectsCT[sActor][sTag][sPath] = nil;
 		if not next(tEffectsCT[sActor][sTag]) then
 			tEffectsCT[sActor][sTag] = nil;
@@ -203,8 +198,8 @@ function setCustomEffectAdded(f)
 end
 
 function removeCustomEffectAdded(f)
-	for kCustomEffectAdded, fCustomEffectUpdated in ipairs(aEffectAdded) do
-		if fCustomEffectUpdated == f then
+	for kCustomEffectAdded, fCustomEffectAdded in ipairs(aEffectAdded) do
+		if fCustomEffectAdded == f then
 			table.remove(aEffectAdded, kCustomEffectAdded);
 		end
 	end
@@ -227,9 +222,9 @@ function setCustomEffectUpdatedCurrent(f)
 end
 
 function removeCustomEffectUpdatedCurrent(f)
-	for kCustomEffectUpdatedPrevious, fCustomEffectUpdatedPrevious in ipairs(aEffectUpdatedCurrent) do
-		if fCustomEffectUpdatedPrevious == f then
-			table.remove(aEffectUpdatedCurrent, kCustomEffectUpdatedPrevious);
+	for kCustomEffectUpdatedCurrent, fCustomEffectUpdatedCurrent in ipairs(aEffectUpdatedCurrent) do
+		if fCustomEffectUpdatedCurrent == f then
+			table.remove(aEffectUpdatedCurrent, kCustomEffectUpdatedCurrent);
 		end
 	end
 end

@@ -264,8 +264,8 @@ end
 -- with very few elements.
 function getMatchedEffects(rActor, sTag)
 	local aReturn = {};
-	if OptionsManager.isOption("TURBO", "on") then
-		local nodeCT = ActorManager.getCTNode(rActor);
+	local nodeCT = ActorManager.getCTNode(rActor);
+	if nodeCT and OptionsManager.isOption("TURBO", "on") then
 		local sActor = nodeCT.getPath();
 		local aEffectPaths = {};
 		local aTags = tEffectsCT[sActor];
@@ -277,7 +277,10 @@ function getMatchedEffects(rActor, sTag)
 			table.insert(aReturn, DB.findNode(sEffectPath));
 		end
 	else
-		aReturn = DB.getChildren(ActorManager.getCTNode(rActor), "effects");
+		if not nodeCT then
+			Debug.console("Can't find CT node: ", rActor);
+		end
+		aReturn = DB.getChildren(nodeCT, "effects");
 	end
 	return aReturn;
 end

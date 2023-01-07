@@ -5,22 +5,18 @@
 
 local getEffectsByType = nil;
 local hasEffect = nil;
-local checkConditionalHelper = nil;
 
 function onInit()
     getEffectsByType = EffectManager35E.getEffectsByType;
     hasEffect = EffectManager35E.hasEffect;
-	checkConditionalHelper = EffectManager35E.checkConditionalHelper;
 
     EffectManager35E.getEffectsByType = customGetEffectsByType;
     EffectManager35E.hasEffect = customHasEffect;
-	EffectManager35E.checkConditionalHelper = customCheckConditionalHelper;
 end
 
 function onClose()
     EffectManager35E.getEffectsByType = getEffectsByType;
     EffectManager35E.hasEffect = hasEffect;
-	EffectManager35E.checkConditionalHelper = checkConditionalHelper;
 end
 
 function customGetEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedOnly)
@@ -276,51 +272,5 @@ function customHasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectT
 	if #aMatch > 0 then
 		return true;
 	end
-	return false;
-end
-
-function customCheckConditionalHelper(rActor, sEffect, rTarget, aIgnore)
-	if not rActor then
-		return false;
-	end
-
-	for _,v in pairs(TurboManager.getMatchedEffects(rActor, sEffect)) do
-		local nActive = DB.getValue(v, "isactive", 0);
-		if nActive ~= 0 and not StringManager.contains(aIgnore, v.getPath()) then
-			-- Parse each effect label
-			local sLabel = DB.getValue(v, "label", "");
-			local aEffectComps = EffectManager.parseEffect(sLabel);
-
-			-- Iterate through each effect component looking for a type match
-			for _,sEffectComp in ipairs(aEffectComps) do
-				local rEffectComp = parseEffectComp(sEffectComp);
-
-				--Check conditionals
-				if rEffectComp.type == "IF" then
-					if not EffectManager35E.checkConditional(rActor, v, rEffectComp.remainder, nil, aIgnore) then
-						break;
-					end
-				elseif rEffectComp.type == "IFT" then
-					if not rTarget then
-						break;
-					end
-					if not EffectManager35E.checkConditional(rTarget, v, rEffectComp.remainder, rActor, aIgnore) then
-						break;
-					end
-
-				-- Check for match
-				elseif rEffectComp.original:lower() == sEffect then
-					if EffectManager.isTargetedEffect(v) then
-						if EffectManager.isEffectTarget(v, rTarget) then
-							return true;
-						end
-					else
-						return true;
-					end
-				end
-			end
-		end
-	end
-
 	return false;
 end

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <root release="3.0" version="3">
-	<announcement text="Turbo v1.0-dev2\rby Ryan Hagelstrom 2023" font="emotefont"/>
+	<announcement text="Turbo v1.0-dev3\rby Ryan Hagelstrom 2023" font="emotefont"/>
 	<properties>
     	<loadorder>1</loadorder>
 		<name>Feature: Turbo</name>
-		<version>1.0-dev2</version>
+		<version>1.0-dev3</version>
 		<author>Ryan Hagelstrom</author>
 		<description>Optimization of the FG Effects processing system</description>
 	</properties>

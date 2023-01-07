@@ -5,22 +5,18 @@
 
 local getEffectsByType = nil;
 local hasEffect = nil;
-local checkConditionalHelper = nil;
 
 function onInit()
     getEffectsByType = EffectManagerPFRPG2.getEffectsByType;
     hasEffect = EffectManagerPFRPG2.hasEffect;
-	checkConditionalHelper = EffectManagerPFRPG2.checkConditionalHelper;
 
     EffectManagerPFRPG2.getEffectsByType = customGetEffectsByType;
     EffectManagerPFRPG2.hasEffect = customHasEffect;
-	EffectManagerPFRPG2.checkConditionalHelper = customCheckConditionalHelper;
 end
 
 function onClose()
     EffectManagerPFRPG2.getEffectsByType = getEffectsByType;
     EffectManagerPFRPG2.hasEffect = hasEffect;
-	EffectManagerPFRPG2.checkConditionalHelper = checkConditionalHelper;
 end
 -- Added aTraitFilter for saves and bLeaveOneShots for not removing one shot effects
 function customGetEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedOnly, aTraitFilter, bLeaveOneShots)
@@ -433,85 +429,4 @@ function customHasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectT
 		return true;
 	end
 	return false;
-end
-
-
-function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
-	GlobalDebug.consoleObjects("checkConditionalHelper - start.  rActor, sEffect, rTarget, aIgnore = ", rActor, sEffect, rTarget, aIgnore);
-	if not rActor then
-		return false;
-	end
-
-	local bReturn = false;
-
-	-- Iterate through each effect
-	local aEffectsDBNodes = TurboManager.getMatchedEffects(rActor, sEffect);
-	local sActorType, nodeActor = ActorManager.getTypeAndNode(rActor);
-
---	local aEffectsDBNodes = DB.getChildren(ActorManager.getCTNode(rActor), "effects");
---	GlobalDebug.consoleObjects("EffectManagerPFRPG2: checkConditionalHelper. sActorType, nodeActor = ", sActorType, nodeActor);
---	if sActorType == "pc" then
---		GlobalDebug.consoleObjects("EffectManager: checkConditionalHelper.  Effects node children = ", DB.getChildren(nodeActor, "effects"));
---		for _,vCharEffectNode in pairs(DB.getChildren(nodeActor, "effects")) do
---			table.insert(aEffectsDBNodes, vCharEffectNode);
---		end
---		if (rActor.nodeActionEffects or "") ~= "" then
---			local nodeActionEffects = DB.findNode(rActor.nodeActionEffects);
---			if nodeActionEffects then
---				for _,vActionEffectNode in pairs(DB.getChildren(nodeActionEffects)) do
---					table.insert(aEffectsDBNodes, vActionEffectNode);
---				end
---			end
---		end
---	end
-
-	GlobalDebug.consoleObjects("EffectManager: checkConditionalHelper.  About to parse through all effects.  aEffectsDBNodes = ", aEffectsDBNodes);
-
-	for _,v in pairs(aEffectsDBNodes) do
-		local nActive = DB.getValue(v, "isactive", 0);
-		if nActive ~= 0 and not StringManager.contains(aIgnore, v.getNodeName()) then
-			-- Parse each effect label
-			local sLabel = DB.getValue(v, "label", "");
-			local bTargeted = EffectManager.isTargetedEffect(v);
-			local aEffectComps = EffectManager.parseEffect(sLabel);
-
-			aEffectComps = AutomationManagerPFRPG2.getEffectsWithVariables(nodeActor, aEffectComps);
-
-			-- Iterate through each effect component looking for a type match
-			local nMatch = 0;
-			for kEffectComp, sEffectComp in ipairs(aEffectComps) do
-				local rEffectComp = EffectManagerPFRPG2.parseEffectComp(sEffectComp);
-				GlobalDebug.consoleObjects("checkConditionalHelper.  About to check conditionals.  sEffect, kEffectComp, sEffectComp, rEffectComp = ", sEffect, kEffectComp, sEffectComp, rEffectComp);
-				--Check conditionals
-				if rEffectComp.type == "IF" then
-					if not EffectManagerPFRPG2.checkConditional(rActor, v, rEffectComp.remainder, nil, aIgnore) then
-						break;
-					end
-				elseif rEffectComp.type == "IFT" then
-					if not rTarget then
-						break;
-					end
-					if not EffectManagerPFRPG2.checkConditional(rTarget, v, rEffectComp.remainder, rActor, aIgnore) then
-						break;
-					end
-
-				-- Check for match
-				-- If the condition is flat-footed then also check if the condition applies the flat-footed condition as well.
-				elseif rEffectComp.original:lower() == sEffect or rEffectComp.type:lower() == sEffect or (sEffect == "flat-footed" and StringManager.contains(DataCommon.flatfootedconditions, rEffectComp.original:lower()))  then
-					GlobalDebug.consoleObjects("checkConditionalHelper.  Have a conditional match - checking for targeting.  rEffectComp.original:lower(), sEffect = ", rEffectComp.original:lower(), sEffect);
-					if bTargeted then
-						if EffectManager.isEffectTarget(v, rTarget) then
-							bReturn = true;
-						end
-					else
-						bReturn = true;
-					end
-				end
-			end
-		end
-	end
-
-	GlobalDebug.consoleObjects("checkConditionalHelper.  End.  Returning bReturn = ", bReturn);
-
-	return bReturn;
 end

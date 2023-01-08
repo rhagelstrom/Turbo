@@ -59,7 +59,7 @@ local function updateEffectsTables(sActor, sLabel, sPath)
 	for _,sComp in pairs(tEffectComps) do
 		local rEffectComp = EffectManager.parseEffectCompSimple(sComp);
 		local sTag = rEffectComp.type;
-		if sTag == "" and not rEffectComp.original:match("%s") then
+		if sTag == "" and (rEffectComp.original:lower() == "magic resistance" or  not rEffectComp.original:match("%s")) then
 			sTag = rEffectComp.original;
 		end
 		sTag = sTag:upper();

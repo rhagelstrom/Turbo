@@ -1,1 +1,2 @@
+[![Build FG Extension](https://github.com/rhagelstrom/Turbo/actions/workflows/create-release.yml/badge.svg)](https://github.com/rhagelstrom/Turbo/actions/workflows/create-release.yml) [![Luacheckrc](https://github.com/rhagelstrom/Turbo/actions/workflows/luacheck.yml/badge.svg)](https://github.com/rhagelstrom/Turbo/actions/workflows/luacheck.yml)
 # Turbo

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <root release="3.0" version="3">
+<<<<<<< HEAD
 	<announcement text="Turbo v1.0-rc1\rby Ryan Hagelstrom 2023" font="emotefont" icon="Turbo" />
+=======
+	<announcement text="Turbo v1.0\rby Ryan Hagelstrom 2023" font="emotefont" icon="Turbo" />
+>>>>>>> d6162eb (Graphics)
 	<properties>
 		<loadorder>1</loadorder>
 		<name>Feature: Turbo</name>
@@ -9,6 +13,7 @@
 		<description>Optimization of the FG Effects processing system</description>
 	</properties>
 	<base>
+		<icon name="Turbo" file="graphics/icons/Turbo.png" />
 		<includefile source="strings/strings.xml" />
 		<script name="TurboManager" file="scripts/manager_effect_turbo.lua" />
 		<script name="TurboEffectManager" file="scripts/CoreRPG/manager_effect.lua" ruleset="CoreRPG" />

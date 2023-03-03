@@ -78,9 +78,9 @@ end
 local function updateRegisteredEffectGuarded(nodeLabel)
     local nodeEffect = DB.getChild(nodeLabel, '..');
     local nodeActor = DB.getChild(nodeEffect, '...');
-    local sActor = nodeActor.getPath();
+    local sActor = DB.getPath(nodeActor);
     local sLabel = DB.getValue(nodeEffect, 'label', '');
-    local sPath = nodeEffect.getPath();
+    local sPath = DB.getPath(nodeEffect);
 
     -- reset what is known about this effect
     if tEffectsLookup[sPath] then
@@ -97,18 +97,18 @@ local function updateRegisteredEffectGuarded(nodeLabel)
 end
 
 local function registerEffectGuarded(nodeEffect, nodeChild)
-    local nodeLabel = DB.getChild(nodeEffect.getPath() .. '.label');
+    local nodeLabel = DB.getChild(DB.getPath(nodeEffect, 'label'));
 
     -- Empty Effect with no label yet
     if not nodeLabel and not nodeChild then
-        DB.addHandler(nodeEffect.getPath(), 'onChildAdded', registerEffect);
-        tLabelOutstandingLookup[nodeEffect.getPath()] = true;
+        DB.addHandler(DB.getPath(nodeEffect), 'onChildAdded', registerEffect);
+        tLabelOutstandingLookup[DB.getPath(nodeEffect)] = true;
         return;
     elseif not nodeLabel then
         return;
     end
-    local sPath = nodeEffect.getPath();
-    local sActor = DB.getChild(nodeEffect, '...').getPath();
+    local sPath = DB.getPath(nodeEffect);
+    local sActor = DB.getPath(DB.getChild(nodeEffect, '...'));
 
     DB.removeHandler(sPath, 'onChildAdded', registerEffect);
     tLabelOutstandingLookup[sPath] = nil;
@@ -118,7 +118,7 @@ local function registerEffectGuarded(nodeEffect, nodeChild)
         tEffectsCT[sActor] = {};
     end
 
-    DB.addHandler(nodeLabel.getPath(), 'onUpdate', updateRegisteredEffect);
+    DB.addHandler(DB.getPath(nodeLabel), 'onUpdate', updateRegisteredEffect);
     DB.addHandler(sPath, 'onDelete', unregisterEffect);
 
     local sLabel = DB.getValue(nodeEffect, 'label', '');
@@ -127,18 +127,18 @@ local function registerEffectGuarded(nodeEffect, nodeChild)
     end
     updateEffectsTables(sActor, sLabel, sPath);
     if nodeChild == nodeLabel then
-        DB.addHandler(nodeEffect.getPath(), 'onChildAdded', registerEffect);
+        DB.addHandler(DB.getPath(nodeEffect), 'onChildAdded', registerEffect);
     end
     onCustomEffectAdded(nodeEffect);
 end
 
 local function unregisterEffectGuarded(nodeEffect)
     local nodeLabel = DB.getChild(nodeEffect, 'label');
-    local sPath = nodeEffect.getPath();
-    local sActor = DB.getChild(nodeEffect, '...').getPath();
+    local sPath = DB.getPath(nodeEffect);
+    local sActor = DB.getPath(DB.getChild(nodeEffect, '...'));
     onCustomEffectDeleted(nodeLabel);
     for sTag, _ in pairs(tEffectsLookup[sPath]) do
-        DB.removeHandler(nodeLabel.getPath(), 'onUpdate', updateRegisteredEffect);
+        DB.removeHandler(DB.getPath(nodeLabel), 'onUpdate', updateRegisteredEffect);
         DB.removeHandler(sPath, 'onDelete', unregisterEffect);
         tEffectsCT[sActor][sTag][sPath] = nil;
         if not next(tEffectsCT[sActor][sTag]) then
@@ -176,7 +176,7 @@ function addCombatEffect(_, nodeEffect)
 end
 -- Is this called before the nodes delete? Will have to test
 function unregisterCombatant(nodeCT)
-    tEffectsCT[nodeCT.getPath()] = nil;
+    tEffectsCT[DB.getPath(nodeCT)] = nil;
 end
 
 function registerEffect(nodeEffect, nodeChild)
@@ -247,14 +247,6 @@ function toggleTurbo()
     end
 end
 
-function printet()
-    Debug.console(tEffectsCT);
-end
-
-function printetl()
-    Debug.console(tEffectsLookup);
-end
-
 -- Keep a table of all the tags on all the actors and the database node path
 -- Searching only effects that have the tag that is being searched for is highly
 -- probable to match unless filtered by a filter or conditional. Far more efficient
@@ -264,7 +256,7 @@ function getMatchedEffects(rActor, sTag)
     local aReturn = {};
     local nodeCT = ActorManager.getCTNode(rActor);
     if nodeCT and OptionsManager.isOption('TURBO', 'on') then
-        local sActor = nodeCT.getPath();
+        local sActor = DB.getPath(nodeCT);
         local aEffectPaths = {};
         local aTags = tEffectsCT[sActor];
         sTag = sTag:upper();
@@ -286,9 +278,6 @@ end
 function onInit()
     CombatManager.setCustomAddCombatantEffectHandler(addCombatEffect);
     CombatManager.setCustomDeleteCombatantHandler(unregisterCombatant);
-
-    Comm.registerSlashHandler('turbo_et', printet, 'Prints out Turbo tEffectsCT table');
-    Comm.registerSlashHandler('turbo_etl', printetl, 'Prints out Turbo tEffectsLookup table');
 
     OptionsManager.registerOption2('TURBO', false, 'option_header_game', 'option_Turbo', 'option_entry_cycler',
                                    {labels = 'option_val_off', values = 'off', baselabel = 'option_val_on', baseval = 'on', default = 'on'});

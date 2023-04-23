@@ -55,17 +55,17 @@ function customGetEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTar
                 -- Look for type/subtype match
                 local nMatch = 0;
                 for kEffectComp, sEffectComp in ipairs(aEffectComps) do
-                    local rEffectComp = parseEffectComp(sEffectComp);
+                    local rEffectComp = EffectManager5E.parseEffectComp(sEffectComp);
                     -- Handle conditionals
                     if rEffectComp.type == 'IF' then
-                        if not EffectManger2E.checkConditional(rActor, v, rEffectComp.remainder) then
+                        if not EffectManagerADND.checkConditional(rActor, v, rEffectComp.remainder) then
                             break
                         end
                     elseif rEffectComp.type == 'IFT' then
                         if not rFilterActor then
                             break
                         end
-                        if not EffectManger2E.checkConditional(rFilterActor, v, rEffectComp.remainder, rActor) then
+                        if not EffectManagerADND.checkConditional(rFilterActor, v, rEffectComp.remainder, rActor) then
                             break
                         end
                         bTargeted = true;
@@ -194,17 +194,17 @@ function customHasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectT
             -- Iterate through each effect component looking for a type match
             local nMatch = 0;
             for kEffectComp, sEffectComp in ipairs(aEffectComps) do
-                local rEffectComp = parseEffectComp(sEffectComp);
+                local rEffectComp = EffectManager5E.parseEffectComp(sEffectComp);
                 -- Handle conditionals
                 if rEffectComp.type == 'IF' then
-                    if not EffectManger2E.checkConditional(rActor, v, rEffectComp.remainder) then
+                    if not EffectManagerADND.checkConditional(rActor, v, rEffectComp.remainder) then
                         break
                     end
                 elseif rEffectComp.type == 'IFT' then
                     if not rTarget then
                         break
                     end
-                    if not EffectManger2E.checkConditional(rTarget, v, rEffectComp.remainder, rActor) then
+                    if not EffectManagerADND.checkConditional(rTarget, v, rEffectComp.remainder, rActor) then
                         break
                     end
 

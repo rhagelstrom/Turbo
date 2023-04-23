@@ -254,6 +254,14 @@ end
 -- with very few elements.
 function getMatchedEffects(rActor, sTag)
     local aReturn = {};
+    if sTag == 'XDMQPVZ' then
+        local _, sRuleset = getRulesetEffectManager();
+        local rMessage = {};
+        rMessage.icon = 'Turbo';
+        rMessage.font = 'systemfont';
+        rMessage.text = 'Turbo Active using ruleset effect manager: ' .. sRuleset;
+        Comm.addChatMessage(rMessage);
+    end
     local nodeCT = ActorManager.getCTNode(rActor);
     if nodeCT and OptionsManager.isOption('TURBO', 'on') then
         local sActor = DB.getPath(nodeCT);
@@ -276,6 +284,7 @@ function getMatchedEffects(rActor, sTag)
 end
 
 function onInit()
+    Comm.registerSlashHandler('turbo_test', turboTest);
     CombatManager.setCustomAddCombatantEffectHandler(addCombatEffect);
     CombatManager.setCustomDeleteCombatantHandler(unregisterCombatant);
 
@@ -283,6 +292,44 @@ function onInit()
                                    {labels = 'option_val_off', values = 'off', baselabel = 'option_val_on', baseval = 'on', default = 'on'});
 
     OptionsManager.registerCallback('TURBO', toggleTurbo);
+end
+
+function getRulesetEffectManager()
+    local Manager;
+    local sRuleset = User.getRulesetName()
+    if sRuleset == '5E' then
+        Manager = EffectManager5E;
+    elseif sRuleset == '4E' then
+        Manager = EffectManager4E;
+    elseif sRuleset == '3.5E' or sRuleset == 'PFRPG' then
+        Manager = EffectManager35E;
+    elseif sRuleset == '2E' then
+        Manager = EffectManagerADND;
+    elseif sRuleset == 'PFRPG2' then
+        Manager = EffectManagerPFRPG2;
+    elseif sRuleset == 'SFRPG' then
+        Manager = EffectManagerSFRPG;
+    else
+        sRuleset = 'CoreRPG';
+        Manager = EffectManager;
+    end
+    return Manager, sRuleset;
+end
+
+function turboTest()
+    local fManager, _ = getRulesetEffectManager();
+    local aCombatNodes = CombatManager.getCombatantNodes();
+    if next(aCombatNodes) then
+        local nodeCT = ActorManager.getCTNode(aCombatNodes[1]);
+        for _, node in pairs(aCombatNodes) do
+            nodeCT = node;
+            break
+        end
+        local rEffect = {sUnits = '', nDuration = 0, nInit = 0, sName = 'XDMQPVZ:1', sApply = 'action', sSource = '', nGMOnly = 1};
+        EffectManager.addEffect('', '', nodeCT, rEffect, false);
+        local rActor = ActorManager.resolveActor(nodeCT);
+        fManager.getEffectsByType(rActor, 'XDMQPVZ');
+    end
 end
 
 function onTabletopInit()

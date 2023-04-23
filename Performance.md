@@ -3,7 +3,7 @@
 
 
 **<p style="text-align: center;">Author:** Ryan Hagelstrom
-<br>**Date:** March 17th, 2023</p>
+<br>**Date:** March 19th, 2023</p>
 <div style="page-break-after: always; break-after: page;"></div>
 
 ## Problem
@@ -64,6 +64,12 @@ Linux Vanilla Playtest 02-12-23           |Linux Vanilla Playtest 02-12-23 (5ms 
 ![](.resources/Linux-Vanilla-02:12:23.png)  |  ![](.resources/Linux-Vanilla-5-02:12:23.png)
 * Average Time Per Function Call: 0.406323587 ms
 * Total Game Time in Function: 104.365166 seconds
+
+Linux Vanilla Playtest 03-19-23           |Linux Vanilla Playtest 03-19-23 (5ms Scale)
+:-------------------------:|:-------------------------:
+![](.resources/Linux-Vanilla-03:19:23.png)  |  ![](.resources/Linux-Vanilla-5-03:19:23.png)
+* Average Time Per Function Call: 0.285552863 ms
+* Total Game Time in Function: 84.422962 seconds
 
 Linux Enhanced Playtest 02-19-23           |Linux Enhanced Playtest 02-19-23 (5ms Scale)
 :-------------------------:|:-------------------------:
@@ -130,3 +136,29 @@ Windows Enhanced Playtest 02-13-23           |Windows Enhanced Playtest 02-13-23
 
 ## Summary
 Turbo.ext has shown an average performance improvement of **590%** in the 5E ruleset's getEffectsByType function. Although hasEffect's performance gains were not measured, it is also expected to improve, albeit to a lesser extent than getEffectsByType, since it is a simpler function. Turbo.ext has been adapted to support various rulesets, including 5E, 4E, 3.5E/PFRPG, 2E, PFRPG2, and SFRPG, and can be customized to support additional rulesets. Performance gains in rulesets other than 5E are expected to be similar. While performance gains with Turbo.ext may be mostly imperceptible, any improvement will help reduce the perceivable performance impacts caused by other sources.
+
+Hi John,
+
+The gains are measureable and the results of my study of this matter can viewed in the white paper link on the forge.  For SmiteWorks to leverage my code in code, 5E for example, the following lines of code would be changed in manager_effect_5E.lua
+
+Line 512
+
+for _,v in ipairs(DB.getChildList(ActorManager.getCTNode(rActor), "effects")) do
+
+to
+
+for _,v in ipairs(TurboManager.getMatchedEffects(rActor, sEffectType)) do
+
+Line 827
+
+for _,v in ipairs(DB.getChildList(ActorManager.getCTNode(rActor), "effects")) do
+
+to
+
+for _,v in ipairs(TurboManager.getMatchedEffects(rActor, sEffect)) do
+
+Similarly, the same method would be applied in all the other rulesets where this function is implemented.
+
+What I can do, if you are interested, is send you a eval copy that is dormant. You can make the above changes, which will enable the algorithm, and then you can black box test and see if this will suit your needs or if you wish to go in another direction.
+
+What we are hung up on is a license to provide guarantees for both parties. “permission to use your code” doesn't mean anything to me and you haven't offered an alternative to CC4 share alike international that is acceptable to you.

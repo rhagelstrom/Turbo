@@ -3,7 +3,7 @@
 
 
 **<p style="text-align: center;">Author:** Ryan Hagelstrom
-<br>**Date:** March 17th, 2023</p>
+<br>**Date:** March 19th, 2023</p>
 <div style="page-break-after: always; break-after: page;"></div>
 
 ## Problem
@@ -64,6 +64,12 @@ Linux Vanilla Playtest 02-12-23           |Linux Vanilla Playtest 02-12-23 (5ms 
 ![](.resources/Linux-Vanilla-02:12:23.png)  |  ![](.resources/Linux-Vanilla-5-02:12:23.png)
 * Average Time Per Function Call: 0.406323587 ms
 * Total Game Time in Function: 104.365166 seconds
+
+Linux Vanilla Playtest 03-19-23           |Linux Vanilla Playtest 03-19-23 (5ms Scale)
+:-------------------------:|:-------------------------:
+![](.resources/Linux-Vanilla-03:19:23.png)  |  ![](.resources/Linux-Vanilla-5-03:19:23.png)
+* Average Time Per Function Call: 0.285552863 ms
+* Total Game Time in Function: 84.422962 seconds
 
 Linux Enhanced Playtest 02-19-23           |Linux Enhanced Playtest 02-19-23 (5ms Scale)
 :-------------------------:|:-------------------------:

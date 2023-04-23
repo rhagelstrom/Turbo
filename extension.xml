@@ -12,7 +12,7 @@
 		<icon name="Turbo" file="graphics/icons/Turbo.png" />
 		<includefile source="strings/strings.xml" />
 		<script name="TurboManager" file="scripts/manager_effect_turbo.lua" />
-		<script name="TurboEffectManager" file="scripts/CoreRPG/manager_effect.lua" ruleset="CoreRPG" />
+		<script name="TurboEffectManager" file="scripts/CoreRPG/manager_effect.lua"  />
 		<script name="TurboEffectManager5E" file="scripts/5E/manager_effect_5E.lua" ruleset="5E" />
 		<script name="TurboEffectManager4E" file="scripts/4E/manager_effect_4E.lua" ruleset="4E" />
 		<script name="TurboEffectManager35E" file="scripts/35E/manager_effect_35E.lua" ruleset="3.5E|PFRPG" />

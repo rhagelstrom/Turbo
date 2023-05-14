@@ -16,6 +16,12 @@ function onInit()
     EffectManager.registerEffectCompType = customRegisterEffectCompType;
     EffectManager.getEffectsByType = customGetEffectsByType;
     EffectManager.hasEffect = customHasEffect;
+    if Session.IsHost then
+        EffectManager.registerEffectCompType('LIGHT', {bIgnoreExpire = true, bIgnoreTarget = true});
+        EffectManager.registerEffectCompType('VISION', {bIgnoreExpire = true, bIgnoreTarget = true});
+        EffectManager.registerEffectCompType('VISMAX', {bIgnoreExpire = true, bIgnoreTarget = true});
+        EffectManager.registerEffectCompType('VISMOD', {bIgnoreExpire = true, bIgnoreTarget = true});
+    end
 end
 
 function onClose()

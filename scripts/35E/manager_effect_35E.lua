@@ -4,18 +4,39 @@
 --	  	https://creativecommons.org/licenses/by-sa/4.0/
 local getEffectsByType = nil;
 local hasEffect = nil;
+local bOverlays = nil;
+local tKel = {
+    'Feature: Extended automation and overlays',
+    'Feature: StrainInjury plus extended automation and alternative overlays',
+    'Feature: StrainInjury plus extended automation and overlays',
+    'Feature: Extended automation and alternative overlays'
+};
 
 function onInit()
-    getEffectsByType = EffectManager35E.getEffectsByType;
-    hasEffect = EffectManager35E.hasEffect;
+    for _, sName in pairs(Extension.getExtensions()) do
+        if StringManager.contains(tKel, sName) then
+            bOverlays = true;
+            break;
+        elseif StringManager.contains(tKel, Extension.getExtensionInfo(sName).name) then
+            bOverlays = true;
+            break;
+        end
+    end
 
-    EffectManager35E.getEffectsByType = customGetEffectsByType;
-    EffectManager35E.hasEffect = customHasEffect;
+    if not bOverlays then
+        getEffectsByType = EffectManager35E.getEffectsByType;
+        hasEffect = EffectManager35E.hasEffect;
+
+        EffectManager35E.getEffectsByType = customGetEffectsByType;
+        EffectManager35E.hasEffect = customHasEffect;
+    end
 end
 
 function onClose()
-    EffectManager35E.getEffectsByType = getEffectsByType;
-    EffectManager35E.hasEffect = hasEffect;
+    if not bOverlays then
+        EffectManager35E.getEffectsByType = getEffectsByType;
+        EffectManager35E.hasEffect = hasEffect;
+    end
 end
 
 function customGetEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedOnly)

@@ -1,8 +1,8 @@
 [![Build FG Extension](https://github.com/rhagelstrom/Turbo/actions/workflows/create-release.yml/badge.svg)](https://github.com/rhagelstrom/Turbo/actions/workflows/create-release.yml) [![Luacheckrc](https://github.com/rhagelstrom/Turbo/actions/workflows/luacheck.yml/badge.svg)](https://github.com/rhagelstrom/Turbo/actions/workflows/luacheck.yml)
 # Turbo
 
-**Current Version:** 1.3
-**Updated:** 09/13/23
+**Current Version:** 1.4
+**Updated:** 10/20/23
 
 Turbo optimized the performance of the Fantasy Grounds effect processing. It has shown an average performance improvement of **590%** in the 5E ruleset's getEffectsByType function. One may see performance degradation in FG effects processing when:
 * Actors in the CT have more than 15 effects active

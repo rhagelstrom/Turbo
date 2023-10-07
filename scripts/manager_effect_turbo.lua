@@ -2,6 +2,12 @@
 --	  	Copyright © 2023
 --	  	This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
 --	  	https://creativecommons.org/licenses/by-sa/4.0/
+--
+-- luacheck: globals TurboManager _aTurboIgnoreTags onTabletopInit
+-- luacheck: globals addCombatEffect unregisterCombatant registerEffect updateRegisteredEffect
+-- luacheck: globals unregisterEffect setCustomEffectAdded removeCustomEffectAdded
+-- luacheck: globals setCustomEffectUpdatedPrevious removeCustomEffectUpdatedPrevious setCustomEffectUpdatedCurrent removeCustomEffectUpdatedCurrent
+-- luacheck: globals setCustomEffectDeleted removeCustomEffectDeleted toggleTurbo getMatchedEffects getRulesetEffectManager turboTest
 -- The only way this will ever work is if we are very sure that we keep our
 -- tables up to date with the known state of the universe. If they get out of sync
 -- then the entire house of cards comes crashing down.
@@ -136,16 +142,23 @@ local function unregisterEffectGuarded(nodeEffect)
     local nodeLabel = DB.getChild(nodeEffect, 'label');
     local sPath = DB.getPath(nodeEffect);
     local sActor = DB.getPath(DB.getChild(nodeEffect, '...'));
+    local rActor = ActorManager.resolveActor(sActor);
     onCustomEffectDeleted(nodeLabel);
-    for sTag, _ in pairs(tEffectsLookup[sPath]) do
-        DB.removeHandler(DB.getPath(nodeLabel), 'onUpdate', updateRegisteredEffect);
-        DB.removeHandler(sPath, 'onDelete', unregisterEffect);
-        tEffectsCT[sActor][sTag][sPath] = nil;
-        if not next(tEffectsCT[sActor][sTag]) then
-            tEffectsCT[sActor][sTag] = nil;
+    if tEffectsLookup[sPath] and next(tEffectsLookup[sPath]) then
+        for sTag, _ in pairs(tEffectsLookup[sPath]) do
+            DB.removeHandler(DB.getPath(nodeLabel), 'onUpdate', updateRegisteredEffect);
+            DB.removeHandler(sPath, 'onDelete', unregisterEffect);
+            if tEffectsCT[sActor] and next(tEffectsCT[sActor]) and next(tEffectsCT[sActor][sTag]) then
+                if tEffectsCT[sActor][sTag][sPath] then
+                    tEffectsCT[sActor][sTag][sPath] = nil;
+                end
+                if not next(tEffectsCT[sActor][sTag]) then
+                    tEffectsCT[sActor][sTag] = nil;
+                end
+            end
         end
+        tEffectsLookup[sPath] = nil;
     end
-    tEffectsLookup[sPath] = nil;
 end
 
 local function initRegisterEffects()
@@ -288,8 +301,13 @@ function onInit()
     CombatManager.setCustomAddCombatantEffectHandler(addCombatEffect);
     CombatManager.setCustomDeleteCombatantHandler(unregisterCombatant);
 
-    OptionsManager.registerOption2('TURBO', false, 'option_header_game', 'option_Turbo', 'option_entry_cycler',
-                                   {labels = 'option_val_off', values = 'off', baselabel = 'option_val_on', baseval = 'on', default = 'on'});
+    OptionsManager.registerOption2('TURBO', false, 'option_header_game', 'option_Turbo', 'option_entry_cycler', {
+        labels = 'option_val_off',
+        values = 'off',
+        baselabel = 'option_val_on',
+        baseval = 'on',
+        default = 'on'
+    });
 
     OptionsManager.registerCallback('TURBO', toggleTurbo);
 end
@@ -319,12 +337,7 @@ end
 function turboTest()
     local fManager, _ = getRulesetEffectManager();
     local aCombatNodes = CombatManager.getCombatantNodes();
-    if next(aCombatNodes) then
-        local nodeCT = ActorManager.getCTNode(aCombatNodes[1]);
-        for _, node in pairs(aCombatNodes) do
-            nodeCT = node;
-            break
-        end
+    for _, nodeCT in pairs(aCombatNodes) do
         local rEffect = {sUnits = '', nDuration = 0, nInit = 0, sName = 'XDMQPVZ:1', sApply = 'action', sSource = '', nGMOnly = 1};
         EffectManager.addEffect('', '', nodeCT, rEffect, false);
         local rActor = ActorManager.resolveActor(nodeCT);

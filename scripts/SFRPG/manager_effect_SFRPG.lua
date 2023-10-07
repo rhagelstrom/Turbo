@@ -2,6 +2,8 @@
 --	  	Copyright © 2023
 --	  	This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
 --	  	https://creativecommons.org/licenses/by-sa/4.0/
+--
+-- luacheck: globals onInit onClose customGetEffectsByType customHasEffect
 local getEffectsByType = nil;
 local hasEffect = nil;
 
@@ -18,6 +20,7 @@ function onClose()
     EffectManagerSFRPG.hasEffect = hasEffect;
 end
 
+-- luacheck: push ignore 561
 function customGetEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedOnly)
     if not rActor then
         return {};
@@ -40,7 +43,7 @@ function customGetEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTar
     end
 
     -- Determine effect type targeting
-    local bTargetSupport = StringManager.isWord(sEffectType, DataCommon.targetableeffectcomps);
+    -- local bTargetSupport = StringManager.isWord(sEffectType, DataCommon.targetableeffectcomps);
 
     -- Iterate through effects
     for _, v in pairs(TurboManager.getMatchedEffects(rActor, sEffectType)) do
@@ -96,7 +99,8 @@ function customGetEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTar
                                 repeat
                                     local nStartAND, nEndAND = vPhraseOR:find('%s+and%s+', nTempIndexAND);
                                     if nStartAND then
-                                        local sInsert = StringManager.trim(vPhraseOR:sub(nTempIndexAND, nStartAND - nTempIndexAND));
+                                        local sInsert =
+                                            StringManager.trim(vPhraseOR:sub(nTempIndexAND, nStartAND - nTempIndexAND));
                                         table.insert(aComponents, sInsert);
                                         nTempIndexAND = nEndAND;
                                     else
@@ -108,8 +112,9 @@ function customGetEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTar
                         end
                         local j = 1;
                         while aComponents[j] do
-                            if StringManager.contains(DataCommon.dmgtypes, aComponents[j]) or StringManager.contains(DataCommon.bonustypes, aComponents[j]) or
-                                aComponents[j] == 'all' then
+                        -- luacheck: push ignore 542
+                        if StringManager.contains(DataCommon.dmgtypes, aComponents[j]) or
+                                StringManager.contains(DataCommon.bonustypes, aComponents[j]) or aComponents[j] == 'all' then
                                 -- Skip
                             elseif StringManager.contains(DataCommon.rangetypes, aComponents[j]) then
                                 table.insert(aEffectRangeFilter, aComponents[j]);
@@ -119,6 +124,7 @@ function customGetEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTar
 
                             j = j + 1;
                         end
+                        -- luacheck: pop
 
                         -- Check for match
                         local comp_match = false;
@@ -149,7 +155,7 @@ function customGetEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTar
                                 for _, v2 in pairs(aOtherFilter) do
                                     if type(v2) == 'table' then
                                         local bOtherTableMatch = true;
-                                        for k3, v3 in pairs(v2) do
+                                        for _, v3 in pairs(v2) do
                                             if not StringManager.contains(aEffectOtherFilter, v3) then
                                                 bOtherTableMatch = false;
                                                 break
@@ -201,6 +207,7 @@ function customGetEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTar
 
     return results;
 end
+--luacheck: pop
 
 function customHasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets)
     if not sEffect or not rActor then

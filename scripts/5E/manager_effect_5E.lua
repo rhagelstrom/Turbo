@@ -2,6 +2,8 @@
 --	  	Copyright © 2023
 --	  	This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
 --	  	https://creativecommons.org/licenses/by-sa/4.0/
+--
+-- luacheck: globals onInit onClose customGetEffectsByType customHasEffect
 local getEffectsByType = nil;
 local hasEffect = nil;
 
@@ -18,6 +20,7 @@ function onClose()
     EffectManager5E.hasEffect = hasEffect;
 end
 
+-- luacheck: push ignore 561
 function customGetEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedOnly)
     if not rActor then
         return {};
@@ -81,14 +84,19 @@ function customGetEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTar
                             if #s > 0 and ((s:sub(1, 1) == '!') or (s:sub(1, 1) == '~')) then
                                 s = s:sub(2);
                             end
-                            if StringManager.contains(DataCommon.dmgtypes, s) or s == 'all' or StringManager.contains(DataCommon.bonustypes, s) or
-                                StringManager.contains(DataCommon.conditions, s) or StringManager.contains(DataCommon.connectors, s) then
+
+                            -- luacheck: push ignore 542
+                            if StringManager.contains(DataCommon.dmgtypes, s) or s == 'all' or
+                                StringManager.contains(DataCommon.bonustypes, s) or
+                                StringManager.contains(DataCommon.conditions, s) or
+                                StringManager.contains(DataCommon.connectors, s) then
                                 -- SKIP
                             elseif StringManager.contains(DataCommon.rangetypes, s) then
                                 table.insert(aEffectRangeFilter, s);
                             else
                                 table.insert(aEffectOtherFilter, s);
                             end
+                            -- luacheck: pop
 
                             j = j + 1;
                         end
@@ -122,7 +130,7 @@ function customGetEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTar
                                 for _, v2 in pairs(aOtherFilter) do
                                     if type(v2) == 'table' then
                                         local bOtherTableMatch = true;
-                                        for k3, v3 in pairs(v2) do
+                                        for _, v3 in pairs(v2) do
                                             if not StringManager.contains(aEffectOtherFilter, v3) then
                                                 bOtherTableMatch = false;
                                                 break
@@ -174,6 +182,7 @@ function customGetEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTar
     -- RESULTS
     return results;
 end
+-- luacheck: pop
 
 function customHasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets)
     if not sEffect or not rActor then

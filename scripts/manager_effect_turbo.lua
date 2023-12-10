@@ -142,7 +142,6 @@ local function unregisterEffectGuarded(nodeEffect)
     local nodeLabel = DB.getChild(nodeEffect, 'label');
     local sPath = DB.getPath(nodeEffect);
     local sActor = DB.getPath(DB.getChild(nodeEffect, '...'));
-    local rActor = ActorManager.resolveActor(sActor);
     onCustomEffectDeleted(nodeLabel);
     if tEffectsLookup[sPath] and next(tEffectsLookup[sPath]) then
         for sTag, _ in pairs(tEffectsLookup[sPath]) do
